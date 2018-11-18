@@ -113,8 +113,35 @@ results = model.detect([image], verbose=1)
 
 # Visualize results
 r = results[0]
+white_list = [1,2,3,4,6,8]
+#r_whitelisted ={'class_ids': [],
+#                'masks':[],
+#                'rois':[],
+#                'scores':[]}
+#
+#
+#
+#idx = 0
+#white_list = [1,2,3,4,6,8]
+#class_ids = []
+#rois = []
+#masks = []
+#scores = []
+#for i in r['class_ids']:
+#    if i in white_list:
+#        class_ids.append(r['class_ids'][idx])
+#        masks.append(r['masks'][idx])
+#        rois.append(r['rois'][idx])
+#        scores.append(r['scores'][idx])
+#    idx = idx + 1
+#    
+#r_whitelisted['class_ids']= class_ids
+#r_whitelisted['masks']= masks
+#r_whitelisted['rois']= rois
+#r_whitelisted['scores']= scores
+    
 visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
-                            class_names, r['scores'],show_mask=False,show_bbox=True,show_contours=False)
+                            class_names,show_mask=False,show_bbox=True,show_contours=False, white_list=white_list)
 
 # =============================================================================
 ## TODO:
