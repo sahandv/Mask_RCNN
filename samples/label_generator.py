@@ -15,6 +15,11 @@ import skimage.io
 import matplotlib
 import matplotlib.pyplot as plt
 import cv2 as cv2
+from lxml import etree as et
+from imageio import get_reader
+from imageio import imwrite
+from imageio import get_writer
+
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -66,26 +71,6 @@ model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 # Load weights trained on MS-COCO
 model.load_weights(COCO_MODEL_PATH, by_name=True)
 
-
-# COCO Class names
-# Index of the class in the list is its ID. For example, to get ID of
-# the teddy bear class, use: class_names.index('teddy bear')
-#class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
-#               'bus', 'train', 'truck', 'boat', 'traffic light',
-#               'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
-#               'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear',
-#               'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie',
-#               'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
-#               'kite', 'baseball bat', 'baseball glove', 'skateboard',
-#               'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
-#               'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-#               'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
-#               'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed',
-#               'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
-#               'keyboard', 'cell phone', 'microwave', 'oven', 'toaster',
-#               'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
-#               'teddy bear', 'hair drier', 'toothbrush']
-
 class_names = ['BG', 'person', 'bike', 'car', 'bike', 'airplane',
                'bus', 'train', 'truck', 'boat', 'traffic light',
                'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
@@ -101,49 +86,6 @@ class_names = ['BG', 'person', 'bike', 'car', 'bike', 'airplane',
                'keyboard', 'cell phone', 'microwave', 'oven', 'toaster',
                'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
                'teddy bear', 'hair drier', 'toothbrush']
-# =============================================================================
-# Run Object Detection
-# =============================================================================
-
-# Load a random image from the images folder
-file_names = next(os.walk(IMAGE_DIR))[2]
-image_path = os.path.join(IMAGE_DIR, random.choice(file_names))
-image = skimage.io.imread('/home/sahand/Projects/Mask_RCNN/images/ist26.jpg')
-image_cv = cv2.imread(image_path)
-# Run detection
-results = model.detect([image], verbose=1)
-
-# Visualize results
-r = results[0]
-white_list = [1,2,3,4,6,8]
-#r_whitelisted ={'class_ids': [],
-#                'masks':[],
-#                'rois':[],
-#                'scores':[]}
-#
-#
-#
-#idx = 0
-#white_list = [1,2,3,4,6,8]
-#class_ids = []
-#rois = []
-#masks = []
-#scores = []
-#for i in r['class_ids']:
-#    if i in white_list:
-#        class_ids.append(r['class_ids'][idx])
-#        masks.append(r['masks'][idx])
-#        rois.append(r['rois'][idx])
-#        scores.append(r['scores'][idx])
-#    idx = idx + 1
-#    
-#r_whitelisted['class_ids']= class_ids
-#r_whitelisted['masks']= masks
-#r_whitelisted['rois']= rois
-#r_whitelisted['scores']= scores
-    
-visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'], 
-                            class_names,show_mask=False,show_bbox=True,show_contours=False, white_list=white_list)
 
 # =============================================================================
 ## TODO:
@@ -158,17 +100,113 @@ visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
 # =============================================================================
 
 
+#file_name = 'ist26.jpg'
+#image_path = os.path.join('/home/sahand/Projects/Mask_RCNN/images/', file_name)
+video_path = '/home/sahand/Desktop/IstanbulCity/videos/20181118_160039.mp4'
+
+output_dir = '/home/sahand/Desktop/annotation_test/'
+#image = skimage.io.imread(image_path)
+#orig_height, orig_width, channels = image_cv.shape
+white_list = [1,2,3,4,6,8]
+
+# =============================================================================
+# Prepare directories
+# =============================================================================
+
+if not os.path.exists(output_dir):
+    os.makedirs(os.path.join(output_dir, 'images'))
+    os.makedirs(os.path.join(output_dir, 'images_bbox'))
+    os.makedirs(os.path.join(output_dir, 'annotations'))
 
 
+# =============================================================================
+# Read Video
+# =============================================================================
+reader = get_reader(video_path)
 
-
-
-
-
-
-
-
-
+for iframe, frame in enumerate(reader):
+    xml_out_path =  output_dir+'annotations'+'/'+str(iframe)+'.xml'
+    img_out_path =  output_dir+'images'+'/'+str(iframe)+'.jpg'
+    img_bbx_out_path =  output_dir+'images_bbox'+'/'+str(iframe)+'.jpg'
+    
+    orig_height, orig_width, channels = frame.shape
+    # =============================================================================
+    # Predict
+    # =============================================================================
+    
+    # Run detection
+    results = model.detect([frame], verbose=1)
+    
+    # Visualize results
+    r = results[0]
+    
+    visualize.display_instances(frame, r['rois'], r['masks'], r['class_ids'], 
+                                class_names,show_mask=False,show_bbox=True,
+                                show_contours=False, white_list=white_list,
+                                frame_save_path = img_bbx_out_path)
+    
+    # =============================================================================
+    # Parser XML
+    # =============================================================================
+    xml_annotation = et.Element('annotation')
+    xml_folder = et.SubElement(xml_annotation, 'folder')
+    xml_filename = et.SubElement(xml_annotation, 'filename')
+    xml_path = et.SubElement(xml_annotation, 'path')
+    xml_source = et.SubElement(xml_annotation, 'source')
+    xml_database = et.SubElement(xml_source,'database')
+    xml_size = et.SubElement(xml_annotation, 'size')
+    xml_width = et.SubElement(xml_size,'width')
+    xml_height = et.SubElement(xml_size,'height')
+    xml_depth = et.SubElement(xml_size,'depth')
+    xml_segmented = et.SubElement(xml_annotation, 'segmented')
+    
+    xml_folder.text = '' 
+    xml_filename.text = str.split(img_out_path,os.sep)[-1]
+    xml_path.text = img_out_path
+    xml_database.text = 'Unknown'
+    xml_width.text = str(int(orig_width))
+    xml_height.text = str(int(orig_height))
+    xml_depth.text = str(channels)                                               # For RGB/color images
+    xml_segmented.text = '0'
+    
+    idx = 0
+    for class_id in r['class_ids']:
+        if class_id in white_list:
+            label = class_names[class_id]
+            xmax = 0
+            xml_object = et.SubElement(xml_annotation, 'object')
+            xml_name = et.SubElement(xml_object,'name')
+            xml_pose = et.SubElement(xml_object,'pose')
+            xml_truncated = et.SubElement(xml_object,'truncated')
+            xml_difficult = et.SubElement(xml_object,'difficult')
+            xml_bndbox = et.SubElement(xml_object,'bndbox')
+            xml_xmin = et.SubElement(xml_bndbox,'xmin')
+            xml_ymin = et.SubElement(xml_bndbox,'ymin')
+            xml_xmax = et.SubElement(xml_bndbox,'xmax')
+            xml_ymax = et.SubElement(xml_bndbox,'ymax')
+            
+            xml_name.text = label
+            xml_pose.text = 'Unspecified'
+            xml_truncated.text = '0'
+            xml_difficult.text = '0'
+                
+            xmax = r['rois'][idx][3]
+            ymax = r['rois'][idx][2]
+            xmin = r['rois'][idx][1]
+            ymin = r['rois'][idx][0]
+            
+            xml_xmin.text = str(int(xmin))
+            xml_ymin.text = str(int(ymin))
+            xml_xmax.text = str(int(xmax))
+            xml_ymax.text = str(int(ymax))
+            
+        idx = idx+1
+    
+    mydata = et.tostring(xml_annotation, pretty_print=True)  
+    with open(xml_out_path, "wb") as f1:
+        f1.write(mydata)
+    
+    imwrite(img_out_path,frame)
 
 
 

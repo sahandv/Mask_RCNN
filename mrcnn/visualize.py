@@ -97,7 +97,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None,show_contours=True,
-                      color_unify=True,white_list = None):
+                      color_unify=True,white_list = None, frame_save_path = '/'):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -196,7 +196,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
 #            print(cv_color)
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), cv_color, 2)
             cv2.putText(frame,label,(int(x1),int(y1-5)), font, font_scale,(255,255,255),thickness)
-    cv2.imwrite('/home/sahand/annotation.png',frame)
+    cv2.imwrite(frame_save_path,frame)
             
     ax.imshow(masked_image.astype(np.uint8))
 #    ax.figure.savefig('/home/sahand/annotation3.png')
