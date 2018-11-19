@@ -15,6 +15,7 @@ import colorsys
 
 import numpy as np
 from skimage.measure import find_contours
+from skimage import img_as_ubyte
 import matplotlib.pyplot as plt
 from matplotlib import patches,  lines
 from matplotlib.patches import Polygon
@@ -109,6 +110,9 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     colors: (optional) An array or colors to use with each object
     captions: (optional) A list of strings to use as captions for each object
     """
+    thickness = 1
+    font = cv2.FONT_HERSHEY_COMPLEX_SMALL
+    font_scale = 0.7
     # Number of instances
     N = boxes.shape[0]
     if not N:
@@ -137,6 +141,10 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     ax.set_title(title)
 
     masked_image = image.astype(np.uint32).copy()
+    frame = img_as_ubyte(image).copy()
+    frame[:,:,0] = img_as_ubyte(image)[:,:,2].copy()
+    frame[:,:,2] = img_as_ubyte(image)[:,:,0].copy()
+    frame[:,:,1] = img_as_ubyte(image)[:,:,1].copy()
     for i in range(N):
         if class_ids[i] in white_list:
             color = colors[i]
@@ -181,8 +189,18 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                 p = Polygon(verts, facecolor="none", edgecolor=color)
                 if show_contours:
                     ax.add_patch(p)
+            
+            
+#            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2-17)), (00, 150, 00),2)
+            cv_color = (color[0]*250,color[1]*250,color[2]*250)
+#            print(cv_color)
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), cv_color, 2)
+            cv2.putText(frame,label,(int(x1),int(y1-5)), font, font_scale,(255,255,255),thickness)
+    cv2.imwrite('/home/sahand/annotation.png',frame)
+            
     ax.imshow(masked_image.astype(np.uint8))
-    cv2.imwrite('/home/sahand/annotation.png',masked_image)
+#    ax.figure.savefig('/home/sahand/annotation3.png')
+#    
     if auto_show:
         plt.show()
 
