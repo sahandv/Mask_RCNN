@@ -102,9 +102,9 @@ class_names = ['BG', 'person', 'bike', 'car', 'bike', 'airplane',
 
 #file_name = 'ist26.jpg'
 #image_path = os.path.join('/home/sahand/Projects/Mask_RCNN/images/', file_name)
-video_path = '/home/sahand/Desktop/IstanbulCity/videos/20181118_160039.mp4'
+video_path = '/media/sahand/Archive Linux/Data/CityIstanbul/20181118_164931.mp4'
 
-output_dir = '/home/sahand/Desktop/annotation_test/'
+output_dir = '/media/sahand/Archive Linux/Data/CityIstanbul/Annotations_short_test/'
 #image = skimage.io.imread(image_path)
 #orig_height, orig_width, channels = image_cv.shape
 white_list = [1,2,3,4,6,8]
@@ -125,6 +125,8 @@ if not os.path.exists(output_dir):
 reader = get_reader(video_path)
 
 for iframe, frame in enumerate(reader):
+    print('processing frame ',iframe)
+    
     xml_out_path =  output_dir+'annotations'+'/'+str(iframe)+'.xml'
     img_out_path =  output_dir+'images'+'/'+str(iframe)+'.jpg'
     img_bbx_out_path =  output_dir+'images_bbox'+'/'+str(iframe)+'.jpg'
@@ -143,7 +145,8 @@ for iframe, frame in enumerate(reader):
     visualize.display_instances(frame, r['rois'], r['masks'], r['class_ids'], 
                                 class_names,show_mask=False,show_bbox=True,
                                 show_contours=False, white_list=white_list,
-                                frame_save_path = img_bbx_out_path)
+                                frame_save_path = img_bbx_out_path,
+                                save_img = True,show_img = False)
     
     # =============================================================================
     # Parser XML
