@@ -8,6 +8,7 @@ Created on Fri Nov 16 20:58:21 2018
 
 import os
 import sys
+import time
 import random
 import math
 import numpy as np
@@ -102,9 +103,9 @@ class_names = ['BG', 'person', 'bike', 'car', 'bike', 'airplane',
 
 #file_name = 'ist26.jpg'
 #image_path = os.path.join('/home/sahand/Projects/Mask_RCNN/images/', file_name)
-video_path = '/media/sahand/Archive Linux/Data/CityIstanbul/20181118_164931.mp4'
-
-output_dir = '/media/sahand/Archive Linux/Data/CityIstanbul/Annotations_short_test/'
+video_path = '/media/sahand/Archive Linux/Data/CityIstanbul/20181120_154254.mp4'
+output_dir = '/media/sahand/Archive Linux/Data/CityIstanbul/Annotations_20181120_154254/'
+output_frame_prefix = '20181120_1542-'
 #image = skimage.io.imread(image_path)
 #orig_height, orig_width, channels = image_cv.shape
 white_list = [1,2,3,4,6,8]
@@ -126,10 +127,10 @@ reader = get_reader(video_path)
 
 for iframe, frame in enumerate(reader):
     print('processing frame ',iframe)
-    
-    xml_out_path =  output_dir+'annotations'+'/'+str(iframe)+'.xml'
-    img_out_path =  output_dir+'images'+'/'+str(iframe)+'.jpg'
-    img_bbx_out_path =  output_dir+'images_bbox'+'/'+str(iframe)+'.jpg'
+    start_time = time.time()
+    xml_out_path =  output_dir+'annotations'+'/'+output_frame_prefix+str(iframe)+'.xml'
+    img_out_path =  output_dir+'images'+'/'+output_frame_prefix+str(iframe)+'.jpg'
+    img_bbx_out_path =  output_dir+'images_bbox'+'/'+output_frame_prefix+str(iframe)+'.jpg'
     
     orig_height, orig_width, channels = frame.shape
     # =============================================================================
@@ -210,7 +211,8 @@ for iframe, frame in enumerate(reader):
         f1.write(mydata)
     
     imwrite(img_out_path,frame)
-
+    
+    print('Frame processing time: '+str((time.time() - start_time))+'s')
 
 
 

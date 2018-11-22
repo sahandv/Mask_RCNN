@@ -149,7 +149,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     for i in range(N):
         if class_ids[i] in white_list:
             color = colors[i]
-    
+            
             # Bounding box
             if not np.any(boxes[i]):
                 # Skip this instance. Has no bbox. Likely lost in image cropping.
@@ -172,27 +172,27 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                 caption = captions[i]
             ax.text(x1, y1 + 8, caption,
                     color='w', size=11, backgroundcolor="none")
-    
-            # Mask
-            mask = masks[:, :, i]
-            if show_mask:
-                masked_image = apply_mask(masked_image, mask, color)
-    
-            # Mask Polygon
-            # Pad to ensure proper polygons for masks that touch image edges.
-            padded_mask = np.zeros(
-                (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
-            padded_mask[1:-1, 1:-1] = mask
-            contours = find_contours(padded_mask, 0.5)
-            for verts in contours:
-                # Subtract the padding and flip (y, x) to (x, y)
-                verts = np.fliplr(verts) - 1
-                p = Polygon(verts, facecolor="none", edgecolor=color)
-                if show_contours:
-                    ax.add_patch(p)
-            
-            
-#            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2-17)), (00, 150, 00),2)
+            if show_img: 
+                # Mask
+                mask = masks[:, :, i]
+                if show_mask:
+                    masked_image = apply_mask(masked_image, mask, color)
+        
+                # Mask Polygon
+                # Pad to ensure proper polygons for masks that touch image edges.
+                padded_mask = np.zeros(
+                    (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
+                padded_mask[1:-1, 1:-1] = mask
+                contours = find_contours(padded_mask, 0.5)
+                for verts in contours:
+                    # Subtract the padding and flip (y, x) to (x, y)
+                    verts = np.fliplr(verts) - 1
+                    p = Polygon(verts, facecolor="none", edgecolor=color)
+                    if show_contours:
+                        ax.add_patch(p)
+                
+                
+    #            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2-17)), (00, 150, 00),2)
             cv_color = (color[0]*250,color[1]*250,color[2]*250)
 #            print(cv_color)
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), cv_color, 2)
@@ -202,10 +202,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         cv2.imwrite(frame_save_path,frame)
     if show_img:        
         ax.imshow(masked_image.astype(np.uint8))
-#    ax.figure.savefig('/home/sahand/annotation3.png')
-#    
-    if auto_show:
-        plt.show()
+        if auto_show:
+            plt.show()
 
 
 def display_differences(image,
