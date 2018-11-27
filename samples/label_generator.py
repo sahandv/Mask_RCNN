@@ -103,9 +103,9 @@ class_names = ['BG', 'person', 'bike', 'car', 'bike', 'airplane',
 
 #file_name = 'ist26.jpg'
 #image_path = os.path.join('/home/sahand/Projects/Mask_RCNN/images/', file_name)
-video_path = '/media/sahand/Archive Linux/Data/CityIstanbul/20181120_154254.mp4'
-output_dir = '/media/sahand/Archive Linux/Data/CityIstanbul/Annotations_20181120_154254/'
-output_frame_prefix = '20181120_1542-'
+video_path = '/media/sahand/Archive Linux/Data/CityIstanbul/20181118_165314.mp4'
+output_dir = '/media/sahand/Archive Linux/Data/CityIstanbul/Annotations_20181118_165314/'
+output_frame_prefix = '20181118_165314-'
 #image = skimage.io.imread(image_path)
 #orig_height, orig_width, channels = image_cv.shape
 white_list = [1,2,3,4,6,8]

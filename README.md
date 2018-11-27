@@ -1,3 +1,11 @@
+# Mask R-CNN for Ground Truth Label generation
+
+Here we provide a script to generate ground trugh data using Mask R-CNN. Not much has changed in the main repository, and 2 scripts have been added to the sample directory. 
+
+Initially, refer to the rest of this document for installation of Mask R-CNN. Then navigate to [label_generator.py](samples/label_generator.ipynb) for label generation. Another helper script is also available in the directory in case you need it. 
+
+Make sure to have openCV and imageio installed for this code to run.
+
 # Mask R-CNN for Object Detection and Segmentation
 
 This is an implementation of [Mask R-CNN](https://arxiv.org/abs/1703.06870) on Python 3, Keras, and TensorFlow. The model generates bounding boxes and segmentation masks for each instance of an object in the image. It's based on Feature Pyramid Network (FPN) and a ResNet101 backbone.
