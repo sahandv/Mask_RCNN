@@ -97,8 +97,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       figsize=(16, 16), ax=None,
                       show_mask=True, show_bbox=True,
                       colors=None, captions=None,show_contours=True,
-                      color_unify=True,white_list = None, frame_save_path = '/',
-                      save_img = True,show_img = False):
+                      color_unify=True, white_list = None, frame_save_path = '/',
+                      save_img = False,show_img = False):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -147,7 +147,14 @@ def display_instances(image, boxes, masks, class_ids, class_names,
     frame[:,:,2] = img_as_ubyte(image)[:,:,0].copy()
     frame[:,:,1] = img_as_ubyte(image)[:,:,1].copy()
     for i in range(N):
-        if class_ids[i] in white_list:
+        go = False
+        if white_list is not None:
+            if class_ids[i] in white_list:
+                go = True
+        else:
+            go = True
+                
+        if go is True:
             color = colors[i]
             
             # Bounding box
